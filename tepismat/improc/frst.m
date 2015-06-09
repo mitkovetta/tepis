@@ -109,7 +109,7 @@ for i_radii = 1:length(radii);
     F(1,:) = 0;
     F(end,:) = 0;
     F(:, 1) = 0;
-    F(:, end-1) = 0;
+    F(:, end) = 0;
     
     S = S + r*imGauss(F, 0.25*r);
     
