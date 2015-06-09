@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="ImageMetadata">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ScannerMetadata">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ContentItem" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="ValueType" type="xs:string"></xs:element>
+										<xs:element name="ConceptName">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="CodeValue" type="xs:string"></xs:element>
+													<xs:element name="CodingSchemeDesignator" type="xs:string"></xs:element>
+													<xs:element name="CodeMeaning" type="xs:string"></xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Text" type="xs:string"></xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="StainMetadata">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ContentItem" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="ValueType" type="xs:string"></xs:element>
+										<xs:element name="ConceptName">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="CodeValue" type="xs:string"></xs:element>
+													<xs:element name="CodingSchemeDesignator" type="xs:string"></xs:element>
+													<xs:element name="CodeMeaning" type="xs:string"></xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Code">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="CodeValue" type="xs:string"></xs:element>
+													<xs:element name="CodingSchemeDesignator" type="xs:string"></xs:element>
+													<xs:element name="CodeMeaning" type="xs:string"></xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="PrimaryAnatomicStructure">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ContentItem">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="ValueType" type="xs:string"></xs:element>
+										<xs:element name="Code">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="CodeValue" type="xs:string"></xs:element>
+													<xs:element name="CodingSchemeDesignator" type="xs:string"></xs:element>
+													<xs:element name="CodeMeaning" type="xs:string"></xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="PixelMetadata">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="NumberOfLevels" type="xs:int"></xs:element>
+							<xs:element name="Levels">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="PixelLevelMetadata" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Level" type="xs:int"></xs:element>
+													<xs:element name="PixelSize" type="xs:string"></xs:element>
+													<xs:element name="PhysicalOrigin" type="xs:string"></xs:element>
+													<xs:element name="PhysicalSpacing" type="xs:string"></xs:element>
+													<xs:element name="ScanFactor" type="xs:double"></xs:element>
+													<xs:element name="IsNativeLevel" type="xs:boolean"></xs:element>
+													<xs:element name="IsLossyCompressed" type="xs:boolean"></xs:element>
+													<xs:element name="TileSize" type="xs:string"></xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
