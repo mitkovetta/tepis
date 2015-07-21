@@ -3,8 +3,8 @@ classdef DigitalSlide < ImageAdapter
     %
     % Basic usage:
     % ------------
-    % Login to the tEPIS server:
-    % DigitalSlide.login('https://<domain>/', '<username>', '<password>');
+    % Authenticate on the tEPIS server:
+    % DigitalSlide.initialize('https://<domain>/', '<username>', '<password>');
     %
     % Create a digital slide object:
     % slide = DigitalSlide('<image-ID>');
@@ -77,7 +77,7 @@ classdef DigitalSlide < ImageAdapter
     % Philips IMS server. See this answer in MATLAB Central for solution:
     % http://www.mathworks.com/matlabcentral/answers/92506
     %
-    % See also: login, getImagePixelData, getTiledImagePixelData,
+    % See also: initialize, getImagePixelData, getTiledImagePixelData,
     % getAssociatedImage, show, blockproc, ImageAdapter, ImageID, Metadata,
     % BlockProcessingLevel
     %
@@ -1023,7 +1023,7 @@ classdef DigitalSlide < ImageAdapter
     methods (Static, Access = public)
         
         function initialize(domain, username, password)
-            % Log in to the Philips IMS.
+            % Authenticate on the Philips IMS.
             %
             % Usage:
             % ------
