@@ -13,8 +13,7 @@ classdef DigitalSlide < ImageAdapter
     % slide and the lowest (largest) level:
     % I = slide.getImagePixelData(0, 0, 1000, 1000);
     %
-    % Read a region of size 1000-by-1000 pixels from the top level of the
-    % slide and the second level:
+    % Read a region of size 1000-by-1000 pixels from the second level:
     % I = slide.getImagePixelData(0, 0, 1000, 1000, 'level', 1);
     %
     % Read the macro image of the slide:
@@ -69,7 +68,9 @@ classdef DigitalSlide < ImageAdapter
     % slide.detectTMACores();
     % slide.show();
     % slide.plotTMACores();
-    % I = getTMACore(1);
+    %
+    % % Get image data for the first TMA core from the second level.
+    % I = slide.getTMACore(1, 1);
     %
     % Troubleshooting:
     % ----------------
