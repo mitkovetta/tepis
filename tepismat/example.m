@@ -1,9 +1,10 @@
 addpath('improc');
 addpath('util');
-javaaddpath(['util' filesep 'tepisclient-0.0.1-SNAPSHOT-jar-with-dependencies.jar']);
 
-DigitalSlide.initialize('https://ucu00-tepis', 'user', 'pass');
-slide = DigitalSlide('VeryLongID');
+javaaddpath(fullfile('backends', 'tepis', ...
+    'tepisclient-0.0.1-SNAPSHOT-jar-with-dependencies.jar'));
 
-show(slide);
+TepisSlide.initialize('https://ucu00-tepis', 'user', 'pass');
 
+slide = TepisSlide('VeryLongID');
+slide.show();
