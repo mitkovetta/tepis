@@ -38,9 +38,12 @@ classdef OpenSlide < DigitalSlide
         % -----------------
         
         function I = getImagePixelData(obj, x, y, width, height, varargin)
-            
+                        
             parametersStruct = parseParameters;
             
+            x = floor(x * obj.Metadata.downsampling(parametersStruct.level+1, 1));
+            y = floor(y * obj.Metadata.downsampling(parametersStruct.level+1, 2));
+
             data = uint32(zeros(width * height, 1));
             region = libpointer('uint32Ptr', data);
             
@@ -50,11 +53,13 @@ classdef OpenSlide < DigitalSlide
             
             regionRGBA = typecast(region, 'uint8');
             
-            I = uint8(zeros(width,height,3));
+            I = zeros(width, height, 3, 'uint8');
             
             I(:,:,1) = reshape(regionRGBA(3:4:end), width, height);
             I(:,:,2) = reshape(regionRGBA(2:4:end), width, height);
             I(:,:,3) = reshape(regionRGBA(1:4:end), width, height);
+            
+            I = permute(I, [2 1 3]);
             
             % Nested functions
             % ----------------
