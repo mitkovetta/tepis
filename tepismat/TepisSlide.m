@@ -1,4 +1,18 @@
 classdef TepisSlide < DigitalSlide
+    
+    properties (GetAccess = public, SetAccess = protected)
+
+        % (NumberOfLevels-by-2)
+        PhysicalOrigin;
+        % (NumberOfLevels-by-1)
+        IsNativeLevel;
+        % (NumberOfLevels-by-1)
+        IsLossyCompressed;
+        % (NumberOfLevels-by-2)
+        TileSize;
+        
+    end
+    
     % Provides access to digital slides stored on a Philips IMS.
     %
     % Basic usage:
@@ -123,10 +137,10 @@ classdef TepisSlide < DigitalSlide
                 
                 ip = inputParser();
                 
-                ip.addParamValue('level', []);
-                ip.addParamValue('unit', []);
-                ip.addParamValue('quality', []);
-                ip.addParamValue('format', []);
+                ip.addParameter('level', []);
+                ip.addParameter('unit', []);
+                ip.addParameter('quality', []);
+                ip.addParameter('format', []);
                 
                 ip.parse(varargin{:});
                 
@@ -207,8 +221,8 @@ classdef TepisSlide < DigitalSlide
                 
                 ip = inputParser();
                 
-                ip.addParamValue('quality', []);
-                ip.addParamValue('format', []);
+                ip.addParameter('quality', []);
+                ip.addParameter('format', []);
                 
                 ip.parse(varargin{:});
                 
@@ -274,8 +288,8 @@ classdef TepisSlide < DigitalSlide
                 
                 ip = inputParser();
                 
-                ip.addParamValue('quality', []);
-                ip.addParamValue('format', []);
+                ip.addParameter('quality', []);
+                ip.addParameter('format', []);
                 
                 ip.parse(varargin{:});
                 
@@ -324,7 +338,7 @@ classdef TepisSlide < DigitalSlide
             TepisSlide.TepisClient(tepisClient);
             
         end
-                
+        
         function outVal = TepisClient(inVal)
             % Has the role of a static property.
             %
@@ -347,27 +361,26 @@ classdef TepisSlide < DigitalSlide
             
             pixelMetadata = TepisSlide.TepisClient.getImageMetadata(obj.ImageID).getPixelMetadata();
             
-            metadata.numberOfLevels = pixelMetadata.getNumberOfLevels();
+            obj.NumberOfLevels = pixelMetadata.getNumberOfLevels();
             
-            for i_levels = 1:metadata.numberOfLevels
+            for i_levels = 1:obj.NumberOfLevels
                 
                 currentLevel = pixelMetadata.getLevels().getPixelLevelMetadata().get(i_levels-1);
                 
-                metadata.pixelSize(i_levels,1:2) = toArray(currentLevel.getPixelSize(), '%f, ');
-                metadata.physicalOrigin(i_levels,1:2) = toArray(currentLevel.getPhysicalOrigin(), '%f, ');
-                metadata.physicalSpacing(i_levels,1:2) = toArray(currentLevel.getPhysicalSpacing(), '%f, ');
-                metadata.scanFactor(i_levels) = currentLevel.getScanFactor();
+                obj.PixelSize(i_levels,1:2) = toArray(currentLevel.getPixelSize(), '%f, ');                
+                obj.PhysicalSpacing(i_levels,1:2) = toArray(currentLevel.getPhysicalSpacing(), '%f, ');
+                obj.ScanFactor(i_levels) = currentLevel.getScanFactor();
                 
-                metadata.isNativeLevel(i_levels) = currentLevel.isIsNativeLevel();
-                metadata.isLossyCompressed(i_levels) = currentLevel.isIsLossyCompressed();
-                metadata.tileSize(i_levels,1:2) = toArray(currentLevel.getTileSize(), '%f, ');
+                % properties specific to tEPIS slides
+                obj.PhysicalOrigin(i_levels,1:2) = toArray(currentLevel.getPhysicalOrigin(), '%f, ');
+                obj.IsNativeLevel(i_levels) = currentLevel.isIsNativeLevel();
+                obj.IsLossyCompressed(i_levels) = currentLevel.isIsLossyCompressed();
+                obj.TileSize(i_levels,1:2) = toArray(currentLevel.getTileSize(), '%f, ');
                 
             end
             
-            metadata.downsampling = bsxfun(@rdivide, ...
-                metadata.physicalSpacing, metadata.physicalSpacing(1,:));
-            
-            obj.Metadata = metadata;
+            obj.Downsampling = bsxfun(@rdivide, ...
+                obj.PhysicalSpacing, obj.PhysicalSpacing(1,:));
             
             function x = toArray(javaString, format)
                 % Convert Java String object to MATLAB array.

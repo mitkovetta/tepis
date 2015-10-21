@@ -6,6 +6,13 @@ classdef OpenSlide < DigitalSlide
         
     end
     
+    properties (GetAccess = public, SetAccess = protected)
+        
+        % Bounding box of the non-empty region of the slide
+        BoundingBox; % similar to PhysicalOrigin of tEPIS slides?
+        
+    end
+    
     methods (Access = public)
         
         function obj = OpenSlide(imageID)
@@ -18,7 +25,7 @@ classdef OpenSlide < DigitalSlide
                 
                 if ~calllib('libopenslide','openslide_can_open', obj.ImageID)
                     error(['Openslide cannot open the specified file.' ...
-                        'Either it does not exist or it is in an unsupported format']);
+                        'Either it does not exist or it is in an unsupported format.']);
                 end
                 
                 obj.SlidePointer = calllib('libopenslide', ...
@@ -38,12 +45,12 @@ classdef OpenSlide < DigitalSlide
         % -----------------
         
         function I = getImagePixelData(obj, x, y, width, height, varargin)
-                        
+            
             parametersStruct = parseParameters;
             
-            x = floor(x * obj.Metadata.downsampling(parametersStruct.level+1, 1));
-            y = floor(y * obj.Metadata.downsampling(parametersStruct.level+1, 2));
-
+            x = floor(x * obj.Downsampling(parametersStruct.level+1, 1));
+            y = floor(y * obj.Downsampling(parametersStruct.level+1, 2));
+            
             data = uint32(zeros(width * height, 1));
             region = libpointer('uint32Ptr', data);
             
@@ -65,12 +72,10 @@ classdef OpenSlide < DigitalSlide
             % ----------------
             
             function parametersStruct = parseParameters
-                
-                import tepisclient.*;
-                
+               
                 ip = inputParser();
                 
-                ip.addParamValue('level', 0);
+                ip.addParameter('level', 0);
                 
                 ip.parse(varargin{:});
                 
@@ -122,10 +127,10 @@ classdef OpenSlide < DigitalSlide
         
         function setMetadata(obj)
             
-            obj.Metadata.numberOfLevels = calllib('libopenslide', ...
+            obj.NumberOfLevels = calllib('libopenslide', ...
                 'openslide_get_level_count', obj.SlidePointer);
             
-            for i_levels = 1:obj.Metadata.numberOfLevels
+            for i_levels = 1:obj.NumberOfLevels
                 
                 width = 0;
                 height = 0;
@@ -134,11 +139,11 @@ classdef OpenSlide < DigitalSlide
                     'openslide_get_level_dimensions', obj.SlidePointer, ...
                     i_levels-1, width, height);
                 
-                obj.Metadata.pixelSize(i_levels,:) = double([width height]);
+                obj.PixelSize(i_levels,:) = double([width height]);
                 
                 % note: libopenslide seems to return one downsampling
                 % factor for both dimensions
-                obj.Metadata.downsampling(i_levels,1:2) = calllib('libopenslide', ...
+                obj.Downsampling(i_levels,1:2) = calllib('libopenslide', ...
                     'openslide_get_level_downsample', obj.SlidePointer, i_levels-1);
                 
             end
@@ -151,12 +156,42 @@ classdef OpenSlide < DigitalSlide
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.mpp-y');
             
-            % convert from /mum to /mm
-            physicalSpacingX0 = str2double(physicalSpacingX0) * 10^-3;
-            physicalSpacingY0 = str2double(physicalSpacingY0) * 10^-3;
+            if ~isempty(physicalSpacingX0) && ~isempty(physicalSpacingY0)
+                % convert from micrometers to millimiters
+                physicalSpacingX0 = str2double(physicalSpacingX0) * 10^-3;
+                physicalSpacingY0 = str2double(physicalSpacingY0) * 10^-3;
+                
+                obj.PhysicalSpacing = bsxfun(@mtimes, ...
+                    obj.Downsampling, [physicalSpacingX0 physicalSpacingY0]);
+                
+            end
             
-            obj.Metadata.physicalSpacing = bsxfun(@mtimes, ...
-                obj.Metadata.downsampling, [physicalSpacingX0 physicalSpacingY0]);
+            scanFactor0 = str2double(calllib('libopenslide', ...
+                'openslide_get_property_value', obj.SlidePointer, ...
+                'openslide.objective-power'));
+            
+            % might not be accurate
+            obj.ScanFactor = scanFactor0 ./ mean(obj.Downsampling, 2)';
+            
+            boundingBoxX = calllib('libopenslide', ...
+                'openslide_get_property_value', obj.SlidePointer, ...
+                'openslide.bounds-x');
+            boundingBoxY = calllib('libopenslide', ...
+                'openslide_get_property_value', obj.SlidePointer, ...
+                'openslide.bounds-y');
+            boundingBoxW = calllib('libopenslide', ...
+                'openslide_get_property_value', obj.SlidePointer, ...
+                'openslide.bounds-width');
+            boundingBoxH = calllib('libopenslide', ...
+                'openslide_get_property_value', obj.SlidePointer, ...
+                'openslide.bounds-height');
+            
+            if ~isempty(boundingBoxX) && ~isempty(boundingBoxY) && ...
+                    ~isempty(boundingBoxW) && ~isempty(boundingBoxH)
+                obj.BoundingBox = [...
+                    str2double(boundingBoxX) str2double(boundingBoxY) ...
+                    str2double(boundingBoxW) str2double(boundingBoxH)];
+            end
             
         end
         

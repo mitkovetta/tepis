@@ -62,7 +62,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
     % http://www.mathworks.com/matlabcentral/answers/92506
     %
     % See also: initialize, getImagePixelData, getTiledImagePixelData,
-    % getAssociatedImage, show, blockproc, ImageAdapter, ImageID, Metadata,
+    % getAssociatedImage, show, blockproc, ImageAdapter, ImageID,
     % BlockProcessingLevel
     %
     % ---------------------------------------------------------------------
@@ -93,25 +93,20 @@ classdef (Abstract) DigitalSlide < ImageAdapter
     
     properties (GetAccess = public, SetAccess = protected)
         
-        % Unique image ID on the server (string).
+        % Unique image ID.
         ImageID;
-        
-        % Structure containing the image metadata.
-        %
-        % Fields:
-        % -------
-        % numberOfLevels: 1-by-1 double.
-        % pixelSize: numberOfLevels-by-2 double.
-        % downsampling: numberOfLevels-by-2 double.
-        % physicalSpacing: numberOfLevels-by-2 double.
-        % physicalOrigin: numberOfLevels-by-2 double.        
-        % scanFactor: numberOfLevels-by-1 double.
-        % isNativeLevel: numberOfLevels-by-1 logical.
-        % isLossyCompressed: numberOfLevels-by-1 logical.
-        % tileSize: numberOfLevels-by-2 double.
-        %
-        Metadata;
-        
+             
+        % Number of levels in the slide pyramid (1-by-1)        
+        NumberOfLevels;
+        % Size of each level in pixels (NumberOfLevels-by-2)
+        PixelSize;
+        % Downsampling factor (NumberOfLevels-by-2)
+        Downsampling;
+        % Physical size of the pixels in mm. (NumberOfLevels-by-2)
+        PhysicalSpacing;
+        % Scanning magnification (NumberOfLevels-by-1)
+        ScanFactor;
+
         % Code version used to create the object.
         Version = DigitalSlide.CURRENT_VERSION;
         
@@ -174,7 +169,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
         
         function set.BlockProcessingLevel(obj, val)
             
-            if val < 0 || val >= obj.Metadata.numberOfLevels
+            if val < 0 || val >= obj.NumberOfLevels
                 error('Invalid level.');
             end
             
@@ -183,7 +178,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             % update the ImageSize propery from the ImageAdapter superclass
             % when BlockProcessingLevel is set
             % convert to row-column coordinate order (from x-y)
-            obj.ImageSize = obj.Metadata.pixelSize(val+1, [2 1]);
+            obj.ImageSize = obj.PixelSize(val+1, [2 1]);
             
         end
         
@@ -246,8 +241,8 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             imageHandle = [];
             
             set(axesHandle,...
-                'XLim', [0 obj.Metadata.pixelSize(1,1) - 1], ...
-                'YLim', [0 obj.Metadata.pixelSize(1,2) - 1]);
+                'XLim', [0 obj.PixelSize(1,1) - 1], ...
+                'YLim', [0 obj.PixelSize(1,2) - 1]);
             
             showRegion();
             
@@ -285,12 +280,12 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 
                 % ensure bounds
                 xLim(xLim < 0) = 0;
-                xLim(xLim > obj.Metadata.pixelSize(1,1) - 1) = obj.Metadata.pixelSize(1,1) - 1;
+                xLim(xLim > obj.PixelSize(1,1) - 1) = obj.PixelSize(1,1) - 1;
                 yLim(yLim < 0) = 0;
-                yLim(yLim > obj.Metadata.pixelSize(1,2) - 1) = obj.Metadata.pixelSize(1,2) - 1;
+                yLim(yLim > obj.PixelSize(1,2) - 1) = obj.PixelSize(1,2) - 1;
                 
-                % determine the image level                                
-                downsampling = obj.Metadata.downsampling;
+                % determine the image level
+                downsampling = obj.Downsampling;
                 
                 area = ((xLim(2)-xLim(1))*(yLim(2)-yLim(1)))./(prod(downsampling,2));
                 
@@ -359,9 +354,9 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 resolutionCheck = @(X)validateattributes(X, {'numeric'}, {'scalar', '>=', 1});
                 paddingCheck = @(X)validateattributes(X, {'numeric'}, {'scalar', '>=', 0, '<=', 1});
                 
-                ip.addParamValue('parent', [], @validateAxesHandle);
-                ip.addParamValue('targetResolution', obj.DEFAULT_TARGET_RESOLUTION, resolutionCheck);
-                ip.addParamValue('padding', obj.DEFAULT_PADDING, paddingCheck);
+                ip.addParameter('parent', [], @validateAxesHandle);
+                ip.addParameter('targetResolution', obj.DEFAULT_TARGET_RESOLUTION, resolutionCheck);
+                ip.addParameter('padding', obj.DEFAULT_PADDING, paddingCheck);
                 
                 ip.parse(varargin{:});
                 
@@ -419,16 +414,16 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             parametersStruct = getParameters();
             
             % note: only horizontal physical spacing is used
-            coreDiameterPixels = parametersStruct.coreDiameter./obj.Metadata.physicalSpacing(:,1);
+            coreDiameterPixels = parametersStruct.coreDiameter./obj.PhysicalSpacing(:,1);
             
             selectedLevel = find(coreDiameterPixels - parametersStruct.targetCoreDiameterPixels > 0, 1, 'last');
             
             if isempty(selectedLevel)
-                selectedLevel = obj.Metadata.numberOfLevels;
+                selectedLevel = obj.NumberOfLevels;
             end
             
-            height = obj.Metadata.pixelSize(selectedLevel,1);
-            width = obj.Metadata.pixelSize(selectedLevel,2);
+            height = obj.PixelSize(selectedLevel,1);
+            width = obj.PixelSize(selectedLevel,2);
             
             I = obj.getImagePixelData(0, 0, height, width, 'level', selectedLevel-1);
             
@@ -445,8 +440,8 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             [r c] = nonmaxsupp(S, 2*radius, prctile(S(S>0), parametersStruct.strictness));
             
             % get the pixel coordinates in the lowest layer
-            x = c*(obj.Metadata.physicalSpacing(selectedLevel,1)/obj.Metadata.physicalSpacing(1,1));
-            y = r*(obj.Metadata.physicalSpacing(selectedLevel,2)/obj.Metadata.physicalSpacing(1,2));
+            x = c*(obj.PhysicalSpacing(selectedLevel,1)/obj.PhysicalSpacing(1,1));
+            y = r*(obj.PhysicalSpacing(selectedLevel,2)/obj.PhysicalSpacing(1,2));
             
             r = coreDiameterPixels(1)*ones(length(r),1)/2;
             
@@ -459,10 +454,10 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 diameterCheck = @(X)validateattributes(X, {'numeric'}, {'scalar', '>', 0});
                 percentageCheck = @(X)validateattributes(X, {'numeric'}, {'scalar', '>=', 0, '<=', 100});
                 
-                ip.addParamValue('coreDiameter', 0.6, diameterCheck);
-                ip.addParamValue('radiusTolerance', 10, percentageCheck);
-                ip.addParamValue('strictness', 90, percentageCheck);
-                ip.addParamValue('targetCoreDiameterPixels', 20, diameterCheck); % undocumented
+                ip.addParameter('coreDiameter', 0.6, diameterCheck);
+                ip.addParameter('radiusTolerance', 10, percentageCheck);
+                ip.addParameter('strictness', 90, percentageCheck);
+                ip.addParameter('targetCoreDiameterPixels', 20, diameterCheck); % undocumented
                 
                 ip.parse(varargin{:});
                 
@@ -496,7 +491,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             
             core = obj.TMACores(coreID,:);
             
-            core = core / (obj.Metadata.physicalSpacing(level+1,2)/obj.Metadata.physicalSpacing(1,2));
+            core = core / (obj.PhysicalSpacing(level+1,2)/obj.PhysicalSpacing(1,2));
             
             x = core(1) - core(3);
             y = core(2) - core(3);
@@ -560,8 +555,8 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 defaultViscircleParameters = {'EdgeColor', 'r', 'LineStyle', '-', 'LineWidth', 2};
                 defaultTextParameters = {'HorizontalAlignment', 'center', 'Color', 'b', 'FontWeight', 'bold', 'Clipping', 'on'};
                 
-                ip.addParamValue('viscircleParametes', defaultViscircleParameters, cellCheck);
-                ip.addParamValue('textParametes', defaultTextParameters, cellCheck);
+                ip.addParameter('viscircleParametes', defaultViscircleParameters, cellCheck);
+                ip.addParameter('textParametes', defaultTextParameters, cellCheck);
                 
                 ip.parse(varargin{:});
                 
@@ -590,18 +585,18 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 switch k
                     case 1
                         if n == 2
-                            index = obj.Metadata.pixelSize(1, 2);
+                            index = obj.PixelSize(1, 2);
                         else
                             error('The ''end'' keyword cannot be used for rows and columns when specifying the level.');
                         end
                     case 2
                         if n == 2
-                            index = obj.Metadata.pixelSize(1, 1);
+                            index = obj.PixelSize(1, 1);
                         else
                             error('The ''end'' keyword cannot be used for rows and columns when specifying the level.');
                         end
                     case 3
-                        index = obj.Metadata.numberOfLevels;
+                        index = obj.NumberOfLevels;
                     case 4
                         index = 3; % color channels
                 end
@@ -648,7 +643,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                         end
                         
                         if strcmp(s.subs{2}, ':')
-                            s.subs{2} = 1:obj.Metadata.pixelSize(level + 1, 1);
+                            s.subs{2} = 1:obj.PixelSize(level + 1, 1);
                         end
                         
                         maxCols = max(s.subs{2});
@@ -657,7 +652,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                         width =  maxCols - minCols + 1;
                         
                         if strcmp(s.subs{1}, ':')
-                            s.subs{1} = 1:obj.Metadata.pixelSize(level + 1, 2);
+                            s.subs{1} = 1:obj.PixelSize(level + 1, 2);
                         end
                         
                         maxRows = max(s.subs{1});
