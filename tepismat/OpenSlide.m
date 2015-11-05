@@ -1,4 +1,31 @@
 classdef OpenSlide < DigitalSlide
+    % Provides access to locally stored digital slides via Openslide.
+    %
+    % Basic usage:
+    % ------------
+    % Initialize Openslide:
+    % OpenSlide.initialize;
+    % (alternatively run init.m)
+    %
+    % Create a digital slide object:
+    % slide = OpenSlide('path/to/slide');
+    %
+    % Read a region of size 1000-by-1000 pixels from the top level of the
+    % slide and the lowest (largest) level:
+    % I = slide.getImagePixelData(0, 0, 1000, 1000);
+    %
+    % Read a region of size 1000-by-1000 pixels from the second level:
+    % I = slide.getImagePixelData(0, 0, 1000, 1000, 'level', 1);
+    %
+    % See also: DigitalSlide, TepisSlide, initialize, getImagePixelData, 
+    % getAssociatedImage, show, blockproc, ImageAdapter, ImageID, Metadata, 
+    % BlockProcessingLevel
+    %
+    % ---------------------------------------------------------------------
+    % Author: Mitko Veta (MVeta@tue.nl)
+    %    
+    % Based on code by Daniel Forsberg.
+    %
     
     properties (Access = private);
         
@@ -67,7 +94,7 @@ classdef OpenSlide < DigitalSlide
             I(:,:,3) = reshape(regionRGBA(1:4:end), width, height);
             
             I = permute(I, [2 1 3]);
-            
+           
             % Nested functions
             % ----------------
             
@@ -85,7 +112,7 @@ classdef OpenSlide < DigitalSlide
             
         end
         
-        function I = getAssociatedImage(obj, type, varargin)
+        function I = getAssociatedImage(obj, type, varargin) %#ok<STOUT,INUSD>
             
             error('NOT_IMPLEMENTED');
             

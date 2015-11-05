@@ -11,6 +11,9 @@ function I = byteArrayToImage(byteArray)
 % NOTE: Make sure that there is sufficient Java heap memory for the
 % conversion.
 %
+% ---------------------------------------------------------------------
+% Author: Mitko Veta (MVeta@tue.nl)
+%
 
 import java.io.*;
 import javax.imageio.*;

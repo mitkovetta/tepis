@@ -61,12 +61,12 @@ classdef (Abstract) DigitalSlide < ImageAdapter
     % Philips IMS server. See this answer in MATLAB Central for solution:
     % http://www.mathworks.com/matlabcentral/answers/92506
     %
-    % See also: initialize, getImagePixelData, getTiledImagePixelData,
+    % See also: TepisSlide, OpenSlide, initialize, getImagePixelData,
     % getAssociatedImage, show, blockproc, ImageAdapter, ImageID,
     % BlockProcessingLevel
     %
     % ---------------------------------------------------------------------
-    % Author: Mitko Veta (mitko@isi.uu.nl)
+    % Author: Mitko Veta (MVeta@tue.nl)
     %
     % Copyright (c) 2014 TraiT (http://www.ctmm-trait.nl/)
     %

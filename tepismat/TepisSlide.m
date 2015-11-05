@@ -1,27 +1,13 @@
 classdef TepisSlide < DigitalSlide
-    
-    properties (GetAccess = public, SetAccess = protected)
-
-        % (NumberOfLevels-by-2)
-        PhysicalOrigin;
-        % (NumberOfLevels-by-1)
-        IsNativeLevel;
-        % (NumberOfLevels-by-1)
-        IsLossyCompressed;
-        % (NumberOfLevels-by-2)
-        TileSize;
-        
-    end
-    
     % Provides access to digital slides stored on a Philips IMS.
     %
     % Basic usage:
     % ------------
     % Authenticate on the tEPIS server:
-    % DigitalSlide.initialize('https://<domain>/', '<username>', '<password>');
+    % TepislSlide.initialize('https://<domain>/', '<user>', '<pass>');
     %
     % Create a digital slide object:
-    % slide = DigitalSlide('<image-ID>');
+    % slide = TepisSlide('<image-ID>');
     %
     % Read a region of size 1000-by-1000 pixels from the top level of the
     % slide and the lowest (largest) level:
@@ -33,10 +19,49 @@ classdef TepisSlide < DigitalSlide
     % Read the macro image of the slide:
     % I = slide.getAssociatedImage('macro');
     %
-    % See also: DigitalSlide, initialize, getImagePixelData, getTiledImagePixelData,
-    % getAssociatedImage, show, blockproc, ImageAdapter, ImageID, Metadata,
-    % BlockProcessingLevel
+    % See also: DigitalSlide, OpenSlide, initialize, getImagePixelData, 
+    % getTiledImagePixelData, getAssociatedImage, show, blockproc, 
+    % ImageAdapter, ImageID, Metadata, BlockProcessingLevel
     %
+    % ---------------------------------------------------------------------
+    % Author: Mitko Veta (MVeta@tue.nl)
+    %
+    % Copyright (c) 2014 TraiT (http://www.ctmm-trait.nl/)
+    %
+    % Permission is hereby granted, free of charge, to any person obtaining
+    % a copy of this software and associated documentation files (the
+    % "Software"), to deal in the Software without restriction, including
+    % without limitation the rights to use, copy, modify, merge, publish,
+    % distribute, sublicense, and/or sell copies of the Software, and to
+    % permit persons to whom the Software is furnished to do so, subject to
+    % the following conditions:
+    %
+    % The above copyright notice and this permission notice shall be
+    % included in all copies or substantial portions of the Software.
+    %
+    % THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    % EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    % MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    % NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    % BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    % ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    % CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    % SOFTWARE.
+    %
+    
+    properties (GetAccess = public, SetAccess = protected)
+        
+        % (NumberOfLevels-by-2)
+        PhysicalOrigin;
+        % (NumberOfLevels-by-1)
+        IsNativeLevel;
+        % (NumberOfLevels-by-1)
+        IsLossyCompressed;
+        % (NumberOfLevels-by-2)
+        TileSize;
+        
+    end
+    
     methods (Access = public)
         % Constructor
         % -----------
@@ -367,7 +392,7 @@ classdef TepisSlide < DigitalSlide
                 
                 currentLevel = pixelMetadata.getLevels().getPixelLevelMetadata().get(i_levels-1);
                 
-                obj.PixelSize(i_levels,1:2) = toArray(currentLevel.getPixelSize(), '%f, ');                
+                obj.PixelSize(i_levels,1:2) = toArray(currentLevel.getPixelSize(), '%f, ');
                 obj.PhysicalSpacing(i_levels,1:2) = toArray(currentLevel.getPhysicalSpacing(), '%f, ');
                 obj.ScanFactor(i_levels) = currentLevel.getScanFactor();
                 
