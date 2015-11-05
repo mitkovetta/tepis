@@ -129,6 +129,7 @@ classdef TepisSlide < DigitalSlide
             % requested region in RGB format.
             %
             % See also: getTiledImagePixelData, getAssociatedImage
+            %
             
             import tepisclient.*;
             

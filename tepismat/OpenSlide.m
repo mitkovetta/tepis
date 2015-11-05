@@ -5,7 +5,7 @@ classdef OpenSlide < DigitalSlide
     % ------------
     % Initialize Openslide:
     % OpenSlide.initialize;
-    % (alternatively run init.m)
+    % (alternatively, run init.m)
     %
     % Create a digital slide object:
     % slide = OpenSlide('path/to/slide');
@@ -72,7 +72,39 @@ classdef OpenSlide < DigitalSlide
         % -----------------
         
         function I = getImagePixelData(obj, x, y, width, height, varargin)
-            
+            % Get image pixel data by specifying point and size.
+            %
+            % Usage:
+            % ------
+            % I = getImagePixelData(slide, x, y, width, height, varargin);
+            % I = getImagePixelData(..., name, value, ...);
+            %
+            % Input arguments:
+            % ----------------
+            % The x, y, width, and height arguments define the coordinates
+            % of the requested rectangular region.
+            %
+            % x: Horizontal top left coordinate of the rectangular region.
+            % y: Vertical top left coordinate of the rectangular region.
+            % width: Width of the rectangular region.
+            % height: Height of the rectangular region.
+            %
+            % Optional input arguments:
+            % -------------------------
+            % These arguments should be passed as name-value pairs.
+            %
+            % level: Level of the rectangular region.
+            % unit: Units of the rectangular region coordinates.
+            % quality: Quality for the compression of the returned image
+            % data (only valid for 'jpeg' format).
+            % format: Format of the returned image data.
+            %
+            % Output arguments:
+            % -----------------
+            % I: Matrix with dimensions height-by-width-by-3 containing the
+            % requested region in RGB format.
+            %
+                        
             parametersStruct = parseParameters;
             
             x = floor(x * obj.Downsampling(parametersStruct.level+1, 1));
@@ -114,7 +146,7 @@ classdef OpenSlide < DigitalSlide
         
         function I = getAssociatedImage(obj, type, varargin) %#ok<STOUT,INUSD>
             
-            error('NOT_IMPLEMENTED');
+            error('NOT IMPLEMENTED');
             
         end
         
@@ -124,6 +156,16 @@ classdef OpenSlide < DigitalSlide
         
         function initialize(openslideIncludePath)
             % Initialize libopenslide.
+            %
+            % Usage:
+            % ------
+            % OpenSlide.initialize;            
+            % OpenSlide.initialize('path/to/openslide/include');
+            %
+            % Input arguments:
+            % ----------------
+            % openslideIncludePath: Path to openslide include directory
+            % containing matlab-openslide-wrapper.h.
             %
             
             if ~libisloaded('libopenslide')
