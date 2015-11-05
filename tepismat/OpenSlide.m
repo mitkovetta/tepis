@@ -93,11 +93,7 @@ classdef OpenSlide < DigitalSlide
             % -------------------------
             % These arguments should be passed as name-value pairs.
             %
-            % level: Level of the rectangular region.
-            % unit: Units of the rectangular region coordinates.
-            % quality: Quality for the compression of the returned image
-            % data (only valid for 'jpeg' format).
-            % format: Format of the returned image data.
+            % level: Level of the rectangular region (default: 0).            
             %
             % Output arguments:
             % -----------------

@@ -115,7 +115,9 @@ classdef TepisSlide < DigitalSlide
             %
             % Optional input arguments:
             % -------------------------
-            % These arguments should be passed as name-value pairs.
+            % These arguments should be passed as name-value pairs. The
+            % default values depend on the configuration of the tEPIS
+            % server.
             %
             % level: Level of the rectangular region.
             % unit: Units of the rectangular region coordinates.
