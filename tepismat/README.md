@@ -10,7 +10,11 @@ Access to locally stored slides is provided trough the OpenSlide library. Please
 
 ## Usage
 
+Check out the documentation for the ```DigitalSlide```, ```TepisSlide``` and ```OpenSlide``` classes for detailed usage instructions and explanation of the parameters.
+
 ### Initialization
+
+The ```TepisSlide``` and ```OpenSlide``` classess need to be initialized before accessing digital slides. The initialization for the ```TepisSlide``` class authenticates the user on the tEPIS server and the initialization for the ```OpenSlide``` class initializes the OpenSlide library.
 
 ```
 %% tEPIS slide
@@ -70,3 +74,7 @@ slide.plotTMACores();
 % Get image data for the first TMA core from the second level.
 I = slide.getTMACore(1, 1);
 ```
+
+### Troubleshooting
+
+Make sure you use a recent version of OpenSlide that supports simplified headers (see: https://github.com/openslide/openslide/issues/116#issuecomment-65187001).
