@@ -29,7 +29,7 @@ OpenSlide.initialize('path/to/openslide/include');
 
 slide = TepisSlide('SlidePath');
 ```
-### Slide display:
+### Slide display
 
 The DigitalSlide.show method implements slide visualization functionalities similar to the MATLAB imshow function. The level from which the image data is read is automatically determined based on the displayed area and the (optional) targetResolution argument.
 
@@ -53,7 +53,7 @@ Note that the subscripted indices begin from '1' instead of '0' and are in row-c
 
 ### Block processing
 
-DigitalSlide inherits from the ImageAdapter class, which enables the use of the blockproc function from the Image Processing Toolbox. Prior to the using blockproc, the BlockProcessingLevel propery needs to be set.     %
+DigitalSlide inherits from the ImageAdapter class, which enables the use of the blockproc function from the Image Processing Toolbox. Prior to the using blockproc, the BlockProcessingLevel propery needs to be set.
 
 For example, this applies someFunction to each distinct 1000-by-1000 block from the larges level of the slide and stores the results in B:
 
