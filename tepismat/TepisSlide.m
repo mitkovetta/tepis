@@ -17,7 +17,13 @@ classdef TepisSlide < DigitalSlide
     % I = slide.getImagePixelData(0, 0, 1000, 1000, 'level', 1);
     %
     % Read the macro image of the slide:
-    % I = slide.getAssociatedImage('macro');
+    % I = slide.getAssociatedImage('macro');    
+    %
+    % Troubleshooting:
+    % ----------------
+    % URL errors may be caused by untrusted security certificate of the
+    % Philips IMS server. See this answer in MATLAB Central for solution:
+    % http://www.mathworks.com/matlabcentral/answers/92506
     %
     % See also: DigitalSlide, OpenSlide, initialize, getImagePixelData, 
     % getTiledImagePixelData, getAssociatedImage, show, blockproc, 

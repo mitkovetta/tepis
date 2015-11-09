@@ -160,8 +160,9 @@ classdef OpenSlide < DigitalSlide
             %
             % Input arguments:
             % ----------------
-            % openslideIncludePath: Path to openslide include directory
-            % containing matlab-openslide-wrapper.h.
+            % openslideIncludePath: Path to the openslide include
+            % directory.
+            % 
             %
             
             if ~libisloaded('libopenslide')

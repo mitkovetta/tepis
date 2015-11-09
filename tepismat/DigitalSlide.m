@@ -1,6 +1,10 @@
 classdef (Abstract) DigitalSlide < ImageAdapter
-    % Abstract class defining an interface for access and visualization of
-    % digital slides.
+    % Abstract class that defines an interface for access to digital
+    % slides. 
+    %
+    % The class also provides rudimentary visualiztion methods, and support
+    % for TMA slides. Support for image analysis is provided trouth the
+    % MATLAB ImageAdapter iterface.
     %
     % Subscripted referencing:
     % ------------------------
@@ -54,12 +58,6 @@ classdef (Abstract) DigitalSlide < ImageAdapter
     %
     % % Get image data for the first TMA core from the second level.
     % I = slide.getTMACore(1, 1);
-    %
-    % Troubleshooting:
-    % ----------------
-    % URL errors may be caused by untrusted security certificate of the
-    % Philips IMS server. See this answer in MATLAB Central for solution:
-    % http://www.mathworks.com/matlabcentral/answers/92506
     %
     % See also: TepisSlide, OpenSlide, initialize, getImagePixelData,
     % getAssociatedImage, show, blockproc, ImageAdapter, ImageID,
