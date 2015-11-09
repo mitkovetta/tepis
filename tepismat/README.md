@@ -1,6 +1,6 @@
 # tepismat
 
-MATLAB client for the tEPIS digital pathology image management and sharing platform. See http://www.ctmm-trait.nl/trait-tools/tepis for more information. Reading of locally stored slides in MATLAB is also provided via OpenSlide (http://openslide.org/).
+MATLAB client for the tEPIS digital pathology image management and sharing platform. See http://www.ctmm-trait.nl/trait-tools/tepis for more information. Reading of locally stored slides is also provided via OpenSlide (http://openslide.org/).
 
 ## Setup
 
@@ -33,7 +33,7 @@ The DigitalSlide.show method implements slide visualization functionalities simi
 slide.show();
 ```
 
-### Subscripted referencing:
+### Subscripted referencing
     
 The classes support easy access to the image data by  subscripted referencing in the following formats:
 
@@ -47,7 +47,7 @@ If not specified, the lowest level and all color channels are returned by defaul
 
 Note that the subscripted indices begin from '1' instead of '0' and are in row-column order to comply with the MATLAB style. The colon (':') operator is supported for rows, columns and color channel only. The 'end' keyword is supported for level and color channel only.
 
-### Block processing:
+### Block processing
 
 DigitalSlide inherits from the ImageAdapter class, which enables the use of the blockproc function from the Image Processing Toolbox. Prior to the using blockproc, the BlockProcessingLevel propery needs to be set.     %
 
@@ -58,7 +58,7 @@ slide.BlockProcessingLevel = 0;
 B = blockproc(slide, [1000 1000], @(X)someFunction(X.data));
 ```
     
-Tissue microarray (TMA) support:
+### Tissue microarray (TMA) support
 
 The class supports handling of TMA slides by implementing detection and visualization of TMA cores and retrival of image data for inividual TMA cores.
 
