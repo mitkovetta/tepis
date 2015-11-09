@@ -12,5 +12,5 @@ slide.show();
 
 OpenSlide.initialize('path/to/openslide/include');
 
-slide = TepisSlide('SlideName');
+slide = TepisSlide('SlidePath');
 slide.show();

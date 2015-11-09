@@ -22,7 +22,7 @@ classdef TepisSlide < DigitalSlide
     % Troubleshooting:
     % ----------------
     % URL errors may be caused by untrusted security certificate of the
-    % Philips IMS server. See this answer in MATLAB Central for solution:
+    % tEPIS server. See this answer in MATLAB Central for solution:
     % http://www.mathworks.com/matlabcentral/answers/92506
     %
     % See also: DigitalSlide, OpenSlide, initialize, getImagePixelData, 
