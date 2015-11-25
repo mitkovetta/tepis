@@ -17,13 +17,13 @@ classdef OpenSlide < DigitalSlide
     % Read a region of size 1000-by-1000 pixels from the second level:
     % I = slide.getImagePixelData(0, 0, 1000, 1000, 'level', 1);
     %
-    % See also: DigitalSlide, TepisSlide, initialize, getImagePixelData, 
-    % getAssociatedImage, show, blockproc, ImageAdapter, ImageID, Metadata, 
+    % See also: DigitalSlide, TepisSlide, initialize, getImagePixelData,
+    % getAssociatedImage, show, blockproc, ImageAdapter, ImageID, Metadata,
     % BlockProcessingLevel
     %
     % ---------------------------------------------------------------------
     % Author: Mitko Veta (MVeta@tue.nl)
-    %    
+    %
     % Based on code by Daniel Forsberg.
     %
     
@@ -93,19 +93,19 @@ classdef OpenSlide < DigitalSlide
             % -------------------------
             % These arguments should be passed as name-value pairs.
             %
-            % level: Level of the rectangular region (default: 0).            
+            % level: Level of the rectangular region (default: 0).
             %
             % Output arguments:
             % -----------------
             % I: Matrix with dimensions height-by-width-by-3 containing the
             % requested region in RGB format.
             %
-                        
+            
             parametersStruct = parseParameters;
             
             x = round(x * obj.Downsampling(parametersStruct.level+1, 1));
             y = round(y * obj.Downsampling(parametersStruct.level+1, 2));
-           
+            
             data = zeros(width * height, 1, 'uint32');
             region = libpointer('uint32Ptr', data);
             
@@ -122,12 +122,12 @@ classdef OpenSlide < DigitalSlide
             I(:,:,3) = reshape(regionRGBA(1:4:end), width, height);
             
             I = permute(I, [2 1 3]);
-           
+            
             % Nested functions
             % ----------------
             
             function parametersStruct = parseParameters
-               
+                
                 ip = inputParser();
                 
                 ip.addParameter('level', 0);
@@ -155,18 +155,25 @@ classdef OpenSlide < DigitalSlide
             %
             % Usage:
             % ------
-            % OpenSlide.initialize;            
+            % OpenSlide.initialize;
             % OpenSlide.initialize('path/to/openslide/include');
             %
             % Input arguments:
             % ----------------
             % openslideIncludePath: Path to the openslide include
             % directory.
-            % 
+            %
             %
             
-            if ~libisloaded('libopenslide')
-                openslideHeaderPath = fileparts(which('matlab-openslide-wrapper.h'));
+            if ispc
+                libraryName = 'libopenslide-0';
+            else
+                libraryName = 'libopenslide';
+            end
+            
+            if ~libisloaded(libraryName)
+                openslideHeaderPath = ...
+                    fileparts(which('matlab-openslide-wrapper.h'));
                 
                 if ~exist('openslideIncludePath', 'var') || ...
                         isempty(openslideIncludePath)
@@ -177,12 +184,13 @@ classdef OpenSlide < DigitalSlide
                     addpath(openslideIncludePath);
                 end
                 
-                [notFound, warnings] = loadlibrary('libopenslide', ...
+                [notFound, warnings] = loadlibrary(libraryName, ...
                     'matlab-openslide-wrapper.h',...
                     'addheader', 'openslide.h',...
-                    'includepath', openslideIncludePath); %#ok<ASGLU>
+                    'includepath', openslideIncludePath, ...
+                    'alias', 'libopenslide'); %#ok<ASGLU>
             else
-                warning('libopenslide is already loaded.')
+                warning('openslidelib is already loaded.')
             end
             
         end
@@ -193,7 +201,7 @@ classdef OpenSlide < DigitalSlide
         
         function setMetadata(obj)
             
-            obj.NumberOfLevels = calllib('libopenslide', ...
+            obj.NumberOfLevels = calllib('openslidelib', ...
                 'openslide_get_level_count', obj.SlidePointer);
             
             for i_levels = 1:obj.NumberOfLevels
@@ -201,24 +209,24 @@ classdef OpenSlide < DigitalSlide
                 width = 0;
                 height = 0;
                 
-                [~, width, height] = calllib('libopenslide', ...
+                [~, width, height] = calllib('openslidelib', ...
                     'openslide_get_level_dimensions', obj.SlidePointer, ...
                     i_levels-1, width, height);
                 
                 obj.PixelSize(i_levels,:) = double([width height]);
-     
-                % note: libopenslide seems to return one downsampling
+                
+                % note: openslidelib seems to return one downsampling
                 % factor for both dimensions
-                obj.Downsampling(i_levels,1:2) = calllib('libopenslide', ...
+                obj.Downsampling(i_levels,1:2) = calllib('openslidelib', ...
                     'openslide_get_level_downsample', obj.SlidePointer, i_levels-1);
-
+                
             end
             
-            physicalSpacingX0 = calllib('libopenslide', ...
+            physicalSpacingX0 = calllib('openslidelib', ...
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.mpp-x');
             
-            physicalSpacingY0 = calllib('libopenslide', ...
+            physicalSpacingY0 = calllib('openslidelib', ...
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.mpp-y');
             
@@ -232,23 +240,23 @@ classdef OpenSlide < DigitalSlide
                 
             end
             
-            scanFactor0 = str2double(calllib('libopenslide', ...
+            scanFactor0 = str2double(calllib('openslidelib', ...
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.objective-power'));
             
             % might not be accurate
             obj.ScanFactor = scanFactor0 ./ mean(obj.Downsampling, 2)';
             
-            boundingBoxX = calllib('libopenslide', ...
+            boundingBoxX = calllib('openslidelib', ...
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.bounds-x');
-            boundingBoxY = calllib('libopenslide', ...
+            boundingBoxY = calllib('openslidelib', ...
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.bounds-y');
-            boundingBoxW = calllib('libopenslide', ...
+            boundingBoxW = calllib('openslidelib', ...
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.bounds-width');
-            boundingBoxH = calllib('libopenslide', ...
+            boundingBoxH = calllib('openslidelib', ...
                 'openslide_get_property_value', obj.SlidePointer, ...
                 'openslide.bounds-height');
             
