@@ -152,6 +152,11 @@ classdef (Abstract) DigitalSlide < ImageAdapter
         % Default padding for visualization.
         DEFAULT_PADDING = 0.15;
         
+        % this enables a workaround that fixes a problem with displaying
+        % the CAMELYOIN16 challenge slides when accessing them with
+        % Openslide
+        CAMELYON16_WORKAROUND = true;
+        
     end
     
     methods
@@ -275,15 +280,19 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 xLim(2) = xLim(2) + deltaX * parametersStruct.padding;
                 yLim(1) = yLim(1) - deltaY * parametersStruct.padding;
                 yLim(2) = yLim(2) + deltaY * parametersStruct.padding;
-                
+                                                
                 % ensure bounds
                 xLim(xLim < 0) = 0;
                 xLim(xLim > obj.PixelSize(1,1) - 1) = obj.PixelSize(1,1) - 1;
                 yLim(yLim < 0) = 0;
                 yLim(yLim > obj.PixelSize(1,2) - 1) = obj.PixelSize(1,2) - 1;
                 
-                % determine the image level
-                downsampling = obj.Downsampling;
+                % determine the image level                
+                if isa(obj, 'OpenSlide') && DigitalSlide.CAMELYON16_WORKAROUND
+                    downsampling = repmat(2.^(0:obj.NumberOfLevels-1)', 1, 2);
+                else
+                    downsampling = obj.Downsampling;
+                end
                 
                 area = ((xLim(2)-xLim(1))*(yLim(2)-yLim(1)))./(prod(downsampling,2));
                 
@@ -292,13 +301,15 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 if isempty(selectedLevel)
                     selectedLevel = 1;
                 end
-                
+               
                 % read the image data
-                x = round(xLim(1)/downsampling(selectedLevel,1));
-                y = round(yLim(1)/downsampling(selectedLevel,2));
+                % x = round(xLim(1)/downsampling(selectedLevel,1));
+                % y = round(yLim(1)/downsampling(selectedLevel,2));
+                x = xLim(1)/downsampling(selectedLevel,1);
+                y = yLim(1)/downsampling(selectedLevel,2);
                 height = round(diff(xLim)/downsampling(selectedLevel,1));
                 width = round(diff(yLim)/downsampling(selectedLevel,2));
-                
+
                 I = obj.getImagePixelData(x, y, height, width, 'level', selectedLevel-1);
                 
                 % update the limits
@@ -317,11 +328,9 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                     set(axesHandle, ...
                         'Visible', 'off', ...
                         'Position', [0 0 1 1], ...
-                        'DataAspectRatio', [1 1 1]);
-                    
+                        'DataAspectRatio', [1 1 1]);                    
                 else
-                    set(imageHandle, 'CData', I, 'XData', xLim, 'YData', yLim);
-                    
+                    set(imageHandle, 'CData', I, 'XData', xLim, 'YData', yLim);                   
                 end
                 
             end

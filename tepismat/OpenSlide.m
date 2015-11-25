@@ -103,10 +103,10 @@ classdef OpenSlide < DigitalSlide
                         
             parametersStruct = parseParameters;
             
-            x = floor(x * obj.Downsampling(parametersStruct.level+1, 1));
-            y = floor(y * obj.Downsampling(parametersStruct.level+1, 2));
-            
-            data = uint32(zeros(width * height, 1));
+            x = round(x * obj.Downsampling(parametersStruct.level+1, 1));
+            y = round(y * obj.Downsampling(parametersStruct.level+1, 2));
+           
+            data = zeros(width * height, 1, 'uint32');
             region = libpointer('uint32Ptr', data);
             
             [~, region] = calllib('libopenslide', 'openslide_read_region', ...
@@ -206,12 +206,12 @@ classdef OpenSlide < DigitalSlide
                     i_levels-1, width, height);
                 
                 obj.PixelSize(i_levels,:) = double([width height]);
-                
+     
                 % note: libopenslide seems to return one downsampling
                 % factor for both dimensions
                 obj.Downsampling(i_levels,1:2) = calllib('libopenslide', ...
                     'openslide_get_level_downsample', obj.SlidePointer, i_levels-1);
-                
+
             end
             
             physicalSpacingX0 = calllib('libopenslide', ...
