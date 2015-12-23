@@ -27,7 +27,7 @@ slide = TepisSlide('VeryLongID');
 
 OpenSlide.initialize('path/to/openslide/include');
 
-slide = TepisSlide('SlidePath');
+slide = OpenSlide('path/to/some/slide');
 ```
 ### Slide display
 
