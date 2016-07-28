@@ -155,7 +155,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
         % this enables a workaround that fixes a problem with displaying
         % the CAMELYOIN16 challenge slides when accessing them with
         % Openslide
-        CAMELYON16_WORKAROUND = true;
+        CAMELYON16_WORKAROUND = false;
         
     end
     

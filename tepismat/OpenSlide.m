@@ -40,6 +40,14 @@ classdef OpenSlide < DigitalSlide
         
     end
     
+    properties (Constant, Hidden)
+       
+        % force white background if the backend returns 
+        FORCE_WHITE_BACKGROUND = true;
+        WHITE_BACKGROUND_INTENSITY = 255;
+        
+    end
+    
     methods (Access = public)
         
         function obj = OpenSlide(imageID)
@@ -122,6 +130,14 @@ classdef OpenSlide < DigitalSlide
             I(:,:,3) = reshape(regionRGBA(1:4:end), width, height);
             
             I = permute(I, [2 1 3]);
+            
+            if OpenSlide.FORCE_WHITE_BACKGROUND
+                M = all(I == 0, 3);
+                if any(M(:))
+                    M = repmat(M, [1 1 3]);
+                    I(M) = OpenSlide.WHITE_BACKGROUND_INTENSITY;
+                end
+            end
             
             % Nested functions
             % ----------------
