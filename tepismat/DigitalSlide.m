@@ -246,9 +246,9 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             set(axesHandle,...
                 'XLim', [0 obj.PixelSize(1,1) - 1], ...
                 'YLim', [0 obj.PixelSize(1,2) - 1]);
-            
+                        
             showRegion();
-            
+                        
             if newFigure
                 set(figureHandle, 'Visible', 'on');
             end
@@ -272,7 +272,7 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                 
                 xLim = get(axesHandle, 'XLim');
                 yLim = get(axesHandle, 'YLim');
-                
+                                
                 % padding
                 deltaX = diff(xLim);
                 deltaY = diff(xLim);
@@ -330,9 +330,9 @@ classdef (Abstract) DigitalSlide < ImageAdapter
                         'Position', [0 0 1 1], ...
                         'DataAspectRatio', [1 1 1]);                    
                 else
-                    set(imageHandle, 'CData', I, 'XData', xLim, 'YData', yLim);                   
+                    set(imageHandle, 'CData', I, 'XData', xLim, 'YData', yLim);                  
                 end
-                
+                             
             end
             
             function panCallback(~, ~)
@@ -343,6 +343,8 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             
             function zoomCallback(~, ~)
                 
+                scaleAxes();
+                
                 % first show the currently loaded image data
                 drawnow;
                 
@@ -351,6 +353,35 @@ classdef (Abstract) DigitalSlide < ImageAdapter
             end
             
             function resizeCallback(~, ~)
+                
+                scaleAxes();
+                
+            end
+            
+            function scaleAxes()
+                % Scales the x-axis so the axes aspect ratio is the same as
+                % the figure aspect ratio.
+               
+                EPS = 0.001;
+                
+                xLim = get(axesHandle, 'XLim');
+                yLim = get(axesHandle, 'YLim');
+                
+                figurePosition = get(figureHandle, 'Position');
+                figureAspectRatio = figurePosition(3)/figurePosition(4);
+                axesAspectRatio = diff(xLim)./diff(yLim);
+                                
+                if abs(figureAspectRatio - axesAspectRatio) > EPS % prevents unnecessary caling
+                    
+                    meanX = xLim(1) + (xLim(2)-xLim(1))/2;
+                    xLim = xLim - meanX;
+                    xLim = xLim * figureAspectRatio / axesAspectRatio;
+                    xLim = xLim + meanX;
+                    
+                    set(axesHandle, 'xLim', xLim);
+                    set(axesHandle, 'yLim', yLim);
+                    
+                end
                 
             end
             
