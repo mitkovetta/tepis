@@ -11,7 +11,7 @@ function P = processWSI(slide, level, blockSize, net, filterSize)
 %
 
 % for skipping mostly empty regions
-MAX_INTENSITY = 240;
+MAX_INTENSITY = 220;
 
 net.blobs('data').reshape([blockSize+filterSize blockSize+filterSize 3 1]);
 net.reshape();
@@ -25,8 +25,8 @@ p = filterSize/2;
 P = zeros(levelSize, 'uint8');
 
 % ignore the border
-for row = 1:blockSize-filterSize:levelSize(1)-blockSize
-    for col = 1:blockSize-filterSize:levelSize(2)-blockSize
+for row = 1:blockSize:levelSize(1)-blockSize
+    for col = 1:blockSize:levelSize(2)-blockSize
         
         disp([row col]);
         
@@ -35,8 +35,7 @@ for row = 1:blockSize-filterSize:levelSize(1)-blockSize
         I = slide(row-p:row+blockSize-1+p, col-p:col+blockSize-1+p, level);
         
         % for testing purposes, returns the red channel
-        % P(row:row+regionSize-1, col:col+regionSize-1) = I(p+1:end-p,
-        % p+1:end-p, 1);
+        % P(row:row+blockSize-1, col:col+blockSize-1) = I(p+1:end-p, p+1:end-p, 1);
         
         % skip mostly empty regions
         if mean(I(:)) > MAX_INTENSITY
@@ -46,9 +45,8 @@ for row = 1:blockSize-filterSize:levelSize(1)-blockSize
             prob = net.forward({single(I(:,:,[3 2 1]))});
             % label "1" is the target class
             prob = prob{1}(:,:,2);
-            prob = uint8(255*prob);
             P(row:row+blockSize-1, col:col+blockSize-1) = ...
-                imresize(prob, [blockSize blockSize]);
+                uint8(255*imresize(prob, [blockSize blockSize], 'nearest'));
         end
         
     end
