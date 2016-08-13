@@ -28,8 +28,7 @@ P = zeros(levelSize, 'uint8');
 for row = 1:blockSize:levelSize(1)-blockSize
     for col = 1:blockSize:levelSize(2)-blockSize
         
-        disp([row col]);
-        
+        disp([row col]);        
         
         I = slide(row-p:row+blockSize-1+p, col-p:col+blockSize-1+p, level);
         
