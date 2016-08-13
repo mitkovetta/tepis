@@ -30,21 +30,18 @@ for row = 1:blockSize:levelSize(1)-blockSize
         
         disp([row col]);
         
-        % OpenSlide returns 0s for out-of-region coordinates, no need to do
-        % "manual" padding
+        
         I = slide(row-p:row+blockSize-1+p, col-p:col+blockSize-1+p, level);
         
-        % for testing purposes, returns the red channel
+        % for testing purposes: just copy the red channel
         % P(row:row+blockSize-1, col:col+blockSize-1) = I(p+1:end-p, p+1:end-p, 1);
         
         % skip mostly empty regions
-        if mean(I(:)) > MAX_INTENSITY
-            P(row:row+blockSize-1, col:col+blockSize-1) = ...
-                zeros(blockSize, blockSize, 'uint8');
-        else
-            prob = net.forward({single(I(:,:,[3 2 1]))});
+        if mean(I(:)) < MAX_INTENSITY
+            I = single(permute(I(:,:,[3, 2, 1]), [2, 1, 3]));
+            prob = net.forward({I});
             % label "1" is the target class
-            prob = prob{1}(:,:,2);
+            prob = permute(prob{1}(:,:,2), [2, 1, 3]);
             P(row:row+blockSize-1, col:col+blockSize-1) = ...
                 uint8(255*imresize(prob, [blockSize blockSize], 'nearest'));
         end
