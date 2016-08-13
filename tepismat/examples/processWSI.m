@@ -5,7 +5,7 @@ function P = processWSI(slide, level, blockSize, net, filterSize)
 % probability map for an entire slide level.
 %
 % The entire probability map is kept in memory so this example is feasible
-% only for smaller layers. filterSize is the size of the patches used to
+% only for smaller levels. filterSize is the size of the patches used to
 % train the network (it is assumed that the FC network was obtained by
 % casting inner product layers to convolutional).
 %
