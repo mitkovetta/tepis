@@ -37,10 +37,10 @@ for row = 1:blockSize:levelSize(1)-blockSize
         
         % skip mostly empty regions
         if mean(I(:)) < MAX_INTENSITY
-            I = single(permute(I(:,:,[3, 2, 1]), [2, 1, 3]));
+            I = single(I(:,:,[3, 2, 1]));
             prob = net.forward({I});
             % label "1" is the target class
-            prob = permute(prob{1}(:,:,2), [2, 1, 3]);
+            prob = prob{1}(:,:,2);
             P(row:row+blockSize-1, col:col+blockSize-1) = ...
                 uint8(255*imresize(prob, [blockSize blockSize], 'nearest'));
         end
