@@ -72,9 +72,14 @@ classdef OpenSlide < DigitalSlide
             
         end
         
-    end
-    
-    methods (Access = public)
+        function delete(obj)
+            % Destructor for the OpenSlide class.
+            %
+            
+            calllib('libopenslide','openslide_close', obj.SlidePointer)
+            
+        end       
+        
         
         % Image data access
         % -----------------
