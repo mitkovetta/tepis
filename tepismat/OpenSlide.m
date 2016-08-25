@@ -76,7 +76,7 @@ classdef OpenSlide < DigitalSlide
             % Destructor for the OpenSlide class.
             %
             
-            calllib('libopenslide','openslide_close', obj.SlidePointer)
+            calllib('libopenslide','openslide_close', obj.SlidePointer);
             
         end       
         
